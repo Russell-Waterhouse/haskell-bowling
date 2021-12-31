@@ -1,0 +1,72 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.4.
+--
+-- see: https://github.com/sol/hpack
+
+name:           bowling
+version:        0.1.0.0
+description:    Please see the README on Github at <https://github.com/russell-waterhouse/bowling#readme>
+homepage:       https://github.com/russell-waterhouse/bowling#readme
+bug-reports:    https://github.com/russell-waterhouse/bowling/issues
+author:         Russell Waterhouse
+maintainer:     Russell.L.Waterhouse@gmail.com
+copyright:      Copyright (c) 2021 Russell Waterhouse
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/russell-waterhouse/bowling
+
+library
+  exposed-modules:
+      Import
+      Run
+      Scoring
+      Types
+      Util
+  other-modules:
+      Paths_bowling
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      base >=4.11 && <10
+    , rio >=0.1.12.0
+  default-language: Haskell2010
+
+executable bowling-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_bowling
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.11 && <10
+    , bowling
+    , optparse-simple
+    , rio >=0.1.12.0
+  default-language: Haskell2010
+
+test-suite bowling-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      ScoringSpec
+      UtilSpec
+      Paths_bowling
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.11 && <10
+    , bowling
+    , hspec
+    , rio >=0.1.12.0
+  default-language: Haskell2010
