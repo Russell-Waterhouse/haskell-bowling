@@ -7,7 +7,7 @@ All other modules were provided by stack.
 This project was written with TDD style. Thus, the tests cover the use cases quite effectively.
 To run the tests, use the command 
 
-$ stack test
+`$ stack test`
 
 ## Executing the project
 As this is just a kata, I have not given the project any IO or top-level structure. 
