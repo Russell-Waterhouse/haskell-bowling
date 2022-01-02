@@ -1,18 +1,17 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-module Scoring (Roll(..), Frame(..), Game(..), score) where
+{-# LANGUAGE ScopedTypeVariables #-}
+module Scoring (Roll, Game, Frame(..), score) where
 
 
-import Import
+import           Import
 
 type Roll =  Int
 
 data Frame = Frame {
-              roll1 :: Roll, 
+              roll1 :: Roll,
               roll2 :: Maybe Roll,
               roll3 :: Maybe Roll
-            }  
-            | Spare
-            | Strike 
+            }
 
 
 type Game =  [Frame]
@@ -23,24 +22,54 @@ score _ | otherwise = 0
 
 score' :: Game -> Int -> Int
 score' [] currentScore =  currentScore
-score' (x: xs) currentScore = 
+score' (x: xs) currentScore =
   let frameScore = scoreFrame x xs
       newScore = frameScore + currentScore
    in score' xs newScore
-score' _ _ | otherwise = 0
 
 scoreFrame :: Frame -> [Frame] -> Int
-scoreFrame (Frame roll1 roll2 roll3) framesAfterRoll = 
-  let roll2Score = case roll2 of
-                     Just r2 -> r2
-                     Nothing -> 0
-      roll3Score = case roll3 of 
-                     Just r3 -> r3 
-                     Nothing -> 0
-  in 
-    roll1 + roll2Score + roll3Score
-scoreFrame Spare framesAfterRoll = undefined
-scoreFrame Strike framesAfterRoll = undefined
+-- strike
+scoreFrame (Frame 10 r2 r3) framesAfterRoll = 
+    10 + (addNextRolls (Frame 10 r2 r3) framesAfterRoll 2)
+-- spare
+scoreFrame (Frame r1 (Just r2) r3) framesAfterRoll 
+  | r1 + r2 == 10 = 
+    10 + (addNextRolls (Frame r1 (Just r2) r3) framesAfterRoll 1)
+-- otherwise
+scoreFrame (Frame r1 (Just r2) r3) _
+  | otherwise = 
+    let roll3Score :: Int = case r3 of
+                       Just roll3points -> roll3points
+                       Nothing -> 0
+    in
+      r1 + r2 + roll3Score
+-- all valid cases have been defined, this covers invalid cases
+scoreFrame _ _ = undefined 
 
-addNextRolls:: Game -> Int -> Int
-addNextRolls = undefined
+addNextRolls:: Frame -> Game -> Int -> Int
+-- add no next rolls
+addNextRolls _ _ 0 = 0
+-- 2 strikes in frame 10
+addNextRolls (Frame 10 (Just 10) (Just r3)) [] 2 = 10 +  r3
+-- 1 strike in frame 10 
+addNextRolls (Frame  10 (Just r2) (Just r3)) [] 2 = r2 + r3
+-- a spare in frame 10
+addNextRolls (Frame r1 (Just r2) (Just r3)) [] 1
+  | r1 + r2 == 10 = r3
+-- current frame was a spare and not frame 10
+addNextRolls _ (nextFrame: _) 1 = 
+  (roll1 nextFrame)
+-- current frame was a strike and not frame 10
+addNextRolls currentFrame (nextFrame: otherFrames) 2 = 
+  let 
+      r1 = roll1 nextFrame
+      r2 = roll2 nextFrame
+      firstRollScore :: Int = r1
+      secondRollScore :: Int = case r2 of 
+                     Just roll2Score -> roll2Score
+                     Nothing -> addNextRolls currentFrame otherFrames 1
+  in 
+    firstRollScore + secondRollScore 
+-- all other cases are invalid
+addNextRolls _ _ _ = undefined
+   
